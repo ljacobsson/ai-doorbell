@@ -28,7 +28,9 @@ function getGender(poi) {
 }
 
 function getAge(personOfInterest) {
-  return Math.round((personOfInterest.AgeRange.High + personOfInterest.AgeRange.Low) / 2);
+  return Math.round(
+    (personOfInterest.AgeRange.High + personOfInterest.AgeRange.Low) / 2
+  );
 }
 
 function moustacheStatus(personOfInterest) {
@@ -57,6 +59,15 @@ function glassesStatus(personOfInterest) {
   }
 }
 
+function describeFace(face) {
+  return `a${beardStatus(face)} ${getEmotion(
+    face
+  )} ${getGender(face)}${moustacheStatus(
+    face
+  )} aged about ${Math.round(getAge(face))}${glassesStatus(
+    face
+  )}`;
+}
 
 module.exports = {
   getEmotion,
@@ -65,4 +76,5 @@ module.exports = {
   moustacheStatus,
   beardStatus,
   glassesStatus,
+  describeFace,
 };

@@ -1,7 +1,6 @@
-const ignoreTaxonimies = ["Person", "Nature"];
+const ignoreTaxonimies = ["Person", "Nature", "Indoors"];
 
 function getAllDetailedLabels(objectDetection) {
-  console.log("od", objectDetection);
   const labels = [];
   for (const taxonomy of getTaxonomies(objectDetection)) {
     labels.push(getMostGranular(objectDetection, taxonomy));

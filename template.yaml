@@ -107,156 +107,18 @@ Resources:
             FunctionName: !Ref GetSignedImageURL
         - LambdaInvokePolicy:
             FunctionName: !Ref SynthesizeSpeech
-      Definition:
-        StartAt: Parallel image analysis
-        States:
-          Parallel image analysis:
-            Type: Parallel
-            Next: Has faces?
-            Branches:
-              - StartAt: Detect faces
-                States:
-                  Detect faces:
-                    Parameters:
-                      Attributes:
-                        - ALL
-                      Image:
-                        S3Object:
-                          Bucket: !Ref S3Bucket
-                          Name.$: $.key
-                    Resource: arn:aws:states:::aws-sdk:rekognition:detectFaces
-                    Type: Task
-                    End: true
-              - StartAt: Detect labels
-                States:
-                  Detect labels:
-                    Type: Task
-                    End: true
-                    Parameters:
-                      Image:
-                        S3Object:
-                          Bucket: !Ref S3Bucket
-                          Name.$: $.key
-                    Resource: arn:aws:states:::aws-sdk:rekognition:detectLabels
-          Has faces?:
-            Type: Choice
-            Choices:
-              - Variable: '$[0].FaceDetails[0]'
-                IsPresent: false
-                Next: Generic message
-            Default: For each face
-          Generic message:
-            Type: Pass
-            Result:
-              message: There's someone at the door!
-              imageUrl: ''
-            Next: Send message to notification channels
-          For each face:
-            Type: Map
-            ItemsPath: $[0].FaceDetails
-            ResultPath: $[0]
-            Iterator:
-              StartAt: Build face description string
-              States:
-                Build face description string:
-                  Type: Task
-                  Resource: 'arn:aws:states:::lambda:invoke'
-                  OutputPath: $.Payload
-                  Parameters:
-                    Payload.$: $
-                    FunctionName: !GetAtt FaceDescription.Arn
-                  Retry:
-                    - ErrorEquals:
-                        - Lambda.ServiceException
-                        - Lambda.AWSLambdaException
-                        - Lambda.SdkClientException
-                      IntervalSeconds: 2
-                      MaxAttempts: 6
-                      BackoffRate: 2
-                  End: true
-            Next: Combine descriptions
-          Combine descriptions:
-            Type: Task
-            Resource: 'arn:aws:states:::lambda:invoke'
-            OutputPath: $.Payload
-            Parameters:
-              Payload:
-                Descriptions.$: $[0]
-                Labels.$: $[1]
-                Key.$: $$.Execution.Input.key
-                Bucket: !Ref S3Bucket
-              FunctionName: !GetAtt CombineDescriptions.Arn
-            Retry:
-              - ErrorEquals:
-                  - Lambda.ServiceException
-                  - Lambda.AWSLambdaException
-                  - Lambda.SdkClientException
-                IntervalSeconds: 2
-                MaxAttempts: 6
-                BackoffRate: 2
-            Next: Send message to notification channels
-          Send message to notification channels:
-            Type: Parallel
-            End: true
-            Branches:
-              - StartAt: Get signed image URL
-                States:
-                  Get signed image URL:
-                    Type: Task
-                    Resource: arn:aws:states:::lambda:invoke
-                    ResultSelector:
-                      url.$: $.Payload
-                    ResultPath: $.image
-                    Parameters:
-                      Payload:
-                        Key.$: $$.Execution.Input.key
-                      FunctionName: !GetAtt GetSignedImageURL.Arn
-                    Retry:
-                      - ErrorEquals:
-                          - Lambda.ServiceException
-                          - Lambda.AWSLambdaException
-                          - Lambda.SdkClientException
-                        IntervalSeconds: 2
-                        MaxAttempts: 6
-                        BackoffRate: 2
-                    Next: Send email
-                  Send email:
-                    End: true
-                    Parameters:
-                      Destination:
-                        ToAddresses:
-                          - !Ref ToEmail
-                      Message:
-                        Body:
-                          Html:
-                            Charset: UTF-8
-                            Data.$: >-
-                              States.Format('{}<br><img src="{}">', $.message,
-                              $.image.url)
-                        Subject:
-                          Charset: UTF-8
-                          Data: Doorbell
-                      Source: !Ref FromEmail
-                    Resource: arn:aws:states:::aws-sdk:ses:sendEmail
-                    Type: Task
-              - StartAt: Synthesise speech
-                States:
-                  Synthesise speech:
-                    Type: Task
-                    Resource: 'arn:aws:states:::lambda:invoke'
-                    OutputPath: $.Payload
-                    Parameters:
-                      Payload.$: $
-                      FunctionName: !GetAtt SynthesizeSpeech.Arn
-                    Retry:
-                      - ErrorEquals:
-                          - Lambda.ServiceException
-                          - Lambda.AWSLambdaException
-                          - Lambda.SdkClientException
-                        IntervalSeconds: 2
-                        MaxAttempts: 6
-                        BackoffRate: 2
-                    End: true
+        - LambdaInvokePolicy:
+            FunctionName: !Ref SingleFaceDescription
+      DefinitionUri: ./statemachine/statemachine.yaml
+      DefinitionSubstitutions:
+        S3Bucket: !Ref S3Bucket
+        ToEmail: !Ref ToEmail
+        FromEmail: !Ref FromEmail
+        SynthesizeSpeech: !GetAtt SynthesizeSpeech.Arn
+        FaceDescription: !GetAtt FaceDescription.Arn
+        SingleFaceDescription: !GetAtt SingleFaceDescription.Arn
+        CombineDescriptions: !GetAtt CombineDescriptions.Arn
+        GetSignedImageURL: !GetAtt GetSignedImageURL.Arn
       Events:
         S3Event:
           Type: EventBridgeRule
@@ -280,6 +142,13 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/FaceDescription.handler
+      Runtime: nodejs14.x
+      Timeout: 10
+  SingleFaceDescription:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: .
+      Handler: src/SingleFaceDescription.handler
       Runtime: nodejs14.x
       Timeout: 10
   CombineDescriptions:
