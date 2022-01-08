@@ -1,0 +1,4 @@
+{
+    "cfn-resource-actions.stackName": "doorbell-backend",
+    "cfn-resource-actions.AWSProfile": "private"
+}

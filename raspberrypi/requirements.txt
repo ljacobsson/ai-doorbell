@@ -1,0 +1,3 @@
+playsound
+AWSIoTPythonSDK
+paho-mqtt

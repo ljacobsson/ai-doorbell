@@ -1,0 +1,194 @@
+{
+    "Labels": [
+        {
+            "Name": "Person",
+            "Confidence": 99.10575103759766,
+            "Instances": [
+                {
+                    "BoundingBox": {
+                        "Width": 0.8604227304458618,
+                        "Height": 0.9591423273086548,
+                        "Left": 0.009906192310154438,
+                        "Top": 0.023257827386260033
+                    },
+                    "Confidence": 99.10575103759766
+                }
+            ],
+            "Parents": []
+        },
+        {
+            "Name": "Human",
+            "Confidence": 99.10575103759766,
+            "Instances": [],
+            "Parents": []
+        },
+        {
+            "Name": "Clothing",
+            "Confidence": 99.08644104003906,
+            "Instances": [],
+            "Parents": []
+        },
+        {
+            "Name": "Apparel",
+            "Confidence": 99.08644104003906,
+            "Instances": [],
+            "Parents": []
+        },
+        {
+            "Name": "Suit",
+            "Confidence": 98.32969665527344,
+            "Instances": [
+                {
+                    "BoundingBox": {
+                        "Width": 0.792388916015625,
+                        "Height": 0.6855128407478333,
+                        "Left": 0.022552888840436935,
+                        "Top": 0.3037392497062683
+                    },
+                    "Confidence": 97.91511535644531
+                }
+            ],
+            "Parents": [
+                {
+                    "Name": "Overcoat"
+                },
+                {
+                    "Name": "Coat"
+                },
+                {
+                    "Name": "Clothing"
+                }
+            ]
+        },
+        {
+            "Name": "Overcoat",
+            "Confidence": 98.32969665527344,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Coat"
+                },
+                {
+                    "Name": "Clothing"
+                }
+            ]
+        },
+        {
+            "Name": "Coat",
+            "Confidence": 98.32969665527344,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Clothing"
+                }
+            ]
+        },
+        {
+            "Name": "Tuxedo",
+            "Confidence": 90.89520263671875,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Suit"
+                },
+                {
+                    "Name": "Overcoat"
+                },
+                {
+                    "Name": "Coat"
+                },
+                {
+                    "Name": "Clothing"
+                }
+            ]
+        },
+        {
+            "Name": "Tie",
+            "Confidence": 89.55455780029297,
+            "Instances": [
+                {
+                    "BoundingBox": {
+                        "Width": 0.12649749219417572,
+                        "Height": 0.0745115652680397,
+                        "Left": 0.4433700740337372,
+                        "Top": 0.48419103026390076
+                    },
+                    "Confidence": 84.72372436523438
+                }
+            ],
+            "Parents": [
+                {
+                    "Name": "Accessories"
+                }
+            ]
+        },
+        {
+            "Name": "Accessories",
+            "Confidence": 89.55455780029297,
+            "Instances": [],
+            "Parents": []
+        },
+        {
+            "Name": "Accessory",
+            "Confidence": 89.55455780029297,
+            "Instances": [],
+            "Parents": []
+        },
+        {
+            "Name": "Shirt",
+            "Confidence": 74.093505859375,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Clothing"
+                }
+            ]
+        },
+        {
+            "Name": "Weapon",
+            "Confidence": 73.1214370727539,
+            "Instances": [],
+            "Parents": []
+        },
+        {
+            "Name": "Weaponry",
+            "Confidence": 73.1214370727539,
+            "Instances": [],
+            "Parents": []
+        },
+        {
+            "Name": "Necktie",
+            "Confidence": 71.44410705566406,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Tie"
+                },
+                {
+                    "Name": "Accessories"
+                }
+            ]
+        },
+        {
+            "Name": "Man",
+            "Confidence": 63.6887092590332,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Person"
+                }
+            ]
+        },
+        {
+            "Name": "Blade",
+            "Confidence": 57.4522590637207,
+            "Instances": [],
+            "Parents": [
+                {
+                    "Name": "Weapon"
+                }
+            ]
+        }
+    ],
+    "LabelModelVersion": "2.0"
+}
