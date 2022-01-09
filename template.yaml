@@ -20,10 +20,10 @@ Resources:
       NotificationConfiguration:
         EventBridgeConfiguration:
           EventBridgeEnabled: true
-  GetUrl:
+  GetS3UploadURL:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: src/GetUrl.handler
+      Handler: src/GetS3UploadURL.handler
       Environment:
         Variables:
           BucketName: !Ref S3Bucket

@@ -1,4 +1,11 @@
-const ignoreTaxonimies = ["Person", "Nature", "Indoors"];
+const includeTaxonimies = [
+  "Clothing",
+  "Apparel",
+  "Electronics",
+  "Pets",
+  "Weapons",
+  "Cardboard",
+];
 
 function getAllDetailedLabels(objectDetection) {
   const labels = [];
@@ -12,7 +19,7 @@ function getTaxonomies(objectDetection) {
   const taxonomies = objectDetection.Labels.filter(
     (p) =>
       p.Parents.length > 0 &&
-      p.Parents.filter((f) => ignoreTaxonimies.includes(f.Name)).length === 0
+      p.Parents.filter((f) => includeTaxonimies.includes(f.Name)).length > 0      
   )
     .map((p) => p.Parents.slice(-1)[0].Name)
     .flat();
