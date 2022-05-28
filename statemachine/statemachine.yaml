@@ -73,7 +73,7 @@ States:
       States:
         Build face description string:
           Type: Task
-          Resource: 'arn:aws:states:::lambda:invoke'
+          Resource: arn:aws:states:::lambda:invoke
           OutputPath: $.Payload
           Parameters:
             Payload.$: $
@@ -90,7 +90,7 @@ States:
     Next: Combine descriptions
   Combine descriptions:
     Type: Task
-    Resource: 'arn:aws:states:::lambda:invoke'
+    Resource: arn:aws:states:::lambda:invoke
     OutputPath: $.Payload
     Parameters:
       Payload:
@@ -156,7 +156,7 @@ States:
         States:
           Synthesise speech and send to MQTT:
             Type: Task
-            Resource: 'arn:aws:states:::lambda:invoke'
+            Resource: arn:aws:states:::lambda:invoke
             OutputPath: $.Payload
             Parameters:
               Payload.$: $
