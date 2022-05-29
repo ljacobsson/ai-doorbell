@@ -7,6 +7,8 @@ States:
       - StartAt: Detect faces
         States:
           Detect faces:
+            Type: Task
+            Resource: arn:aws:states:::aws-sdk:rekognition:detectFaces
             Parameters:
               Attributes:
                 - ALL
@@ -14,20 +16,18 @@ States:
                 S3Object:
                   Bucket: ${S3Bucket}
                   Name.$: $.key
-            Resource: arn:aws:states:::aws-sdk:rekognition:detectFaces
-            Type: Task
             End: true
       - StartAt: Detect labels
         States:
           Detect labels:
             Type: Task
+            Resource: arn:aws:states:::aws-sdk:rekognition:detectLabels
             End: true
             Parameters:
               Image:
                 S3Object:
                   Bucket: ${S3Bucket}
                   Name.$: $.key
-            Resource: arn:aws:states:::aws-sdk:rekognition:detectLabels
   Has faces?:
     Type: Choice
     Choices:
@@ -134,6 +134,8 @@ States:
                 BackoffRate: 2
             Next: Send email
           Send email:
+            Type: Task
+            Resource: arn:aws:states:::aws-sdk:ses:sendEmail
             End: true
             Parameters:
               Destination:
@@ -150,8 +152,6 @@ States:
                   Charset: UTF-8
                   Data: Doorbell
               Source: ${FromEmail}
-            Resource: arn:aws:states:::aws-sdk:ses:sendEmail
-            Type: Task
       - StartAt: Synthesise speech and send to MQTT
         States:
           Synthesise speech and send to MQTT:
