@@ -9,10 +9,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "jest": "^27.4.7",
-    "aws-sdk": "^2.1048.0"
+    "aws-sdk": "^2.1048.0",
+    "jest": "^27.4.7"
   },
   "dependencies": {
+    "openai": "^3.2.1",
     "uuid": "^8.3.2"
   }
 }

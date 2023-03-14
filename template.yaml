@@ -10,9 +10,9 @@ Parameters:
     Type: String
 Globals:
   Function:
-    Runtime: nodejs14.x
+    Runtime: nodejs16.x
     MemorySize: 128
-    Timeout: 15
+    Timeout: 10
 Resources:
   S3Bucket:
     Type: 'AWS::S3::Bucket'
@@ -65,7 +65,7 @@ Resources:
               Effect: Allow
               Action:
                 - 'ses:SendEmail'
-              Resource: 
+              Resource:
                 - '*'
   StateMachine:
     Type: 'AWS::Serverless::StateMachine'
@@ -142,22 +142,16 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/FaceDescription.handler
-      Runtime: nodejs14.x
-      Timeout: 10
   SingleFaceDescription:
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: .
       Handler: src/SingleFaceDescription.handler
-      Runtime: nodejs14.x
-      Timeout: 10
   CombineDescriptions:
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: .
       Handler: src/CombineDescriptions.handler
-      Runtime: nodejs14.x
-      Timeout: 10
       Policies:
         - S3ReadPolicy:
             BucketName: !Ref S3Bucket
@@ -166,8 +160,6 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/SynthesizeSpeech.handler
-      Runtime: nodejs14.x
-      Timeout: 10
       Environment:
         Variables:
           BucketName: !Ref S3Bucket
@@ -195,11 +187,23 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/GetSignedImageURL.handler
-      Runtime: nodejs14.x
-      Timeout: 10
       Environment:
         Variables:
           BucketName: !Ref S3Bucket
       Policies:
         - S3ReadPolicy:
             BucketName: !Ref S3Bucket
+  ChatGPTEnricher:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: .
+      Handler: src/ChatGPTEnricher.handler
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Sid: Statement1
+              Effect: Allow
+              Action:
+                - 'secretsmanager:GetSecretValue'
+              Resource:
+                - '*'
