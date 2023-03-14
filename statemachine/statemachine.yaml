@@ -62,7 +62,7 @@ States:
     Type: Pass
     Result:
       message: There's someone at the door!
-      imageUrl: ''
+      imageUrl: ""
     Next: Send message to notification channels
   For each face:
     Type: Map
@@ -140,18 +140,16 @@ States:
             Parameters:
               Destination:
                 ToAddresses:
-                  - ${ToEmail}
+                  - larsj82@gmail.com
               Message:
                 Body:
                   Html:
                     Charset: UTF-8
-                    Data.$: >-
-                      States.Format('{}<br><img src="{}">', $.message,
-                      $.image.url)
+                    Data.$: States.Format('{}<br><img src={}>', $.message, $.image.url)
                 Subject:
                   Charset: UTF-8
                   Data: Doorbell
-              Source: ${FromEmail}
+              Source: doorbell@rals.io
       - StartAt: Synthesise speech and send to MQTT
         States:
           Synthesise speech and send to MQTT:
