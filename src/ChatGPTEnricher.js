@@ -5,10 +5,15 @@ const secretsManager = new SecretsManager();
 let openai;
 
 const people = [
+  "a drunkard",
+  "a 5 year old",
+  "a romantic poem",
+  "a yo mama joke",
+  "a stand-up comedian",
+  "a news anchor",
   "Donald Trump",
-  "Elon Musk",
   "Super Mario",
-  "Napoleon"  
+  "Yoda",
 ];
 
 exports.handler = async function (event, context) {
@@ -25,13 +30,13 @@ exports.handler = async function (event, context) {
 
   const request = {
     model: "text-davinci-003",
-    prompt: `Say this in the style of ${randomPerson} "${event.message}"`,
+    prompt: `Say this in the style of ${randomPerson}: "${event.message}"`,
     temperature: 0.5,
     max_tokens: 1000
   };
   const text = await openai.createCompletion(request);
   return {
-    message: text.data.choices[0].text,
+    message: text.data.choices[0].text.replace(/"/g, ""),
     person: randomPerson
   };
 }
