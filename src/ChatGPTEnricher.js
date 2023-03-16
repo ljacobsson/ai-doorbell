@@ -29,7 +29,7 @@ exports.handler = async function (event, context) {
   const randomPerson = people[Math.floor(Math.random() * people.length)];
 
   const request = {
-    model: "text-davinci-003",
+    model: "gpt-3.5-turbo",
     prompt: `Say this in the style of ${randomPerson}: "${event.message}"`,
     temperature: 0.5,
     max_tokens: 1000
