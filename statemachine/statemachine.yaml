@@ -132,33 +132,58 @@ States:
                 IntervalSeconds: 2
                 MaxAttempts: 6
                 BackoffRate: 2
-            Next: Send email
-          Send email:
-            Type: Task
-            Resource: arn:aws:states:::aws-sdk:ses:sendEmail
+            Next: Parallel
+          Parallel:
+            Type: Parallel
+            Branches:
+              - StartAt: Send email
+                States:
+                  Send email:
+                    Type: Task
+                    Resource: arn:aws:states:::aws-sdk:ses:sendEmail
+                    End: true
+                    Parameters:
+                      Destination:
+                        ToAddresses:
+                          - ${ToEmail}
+                      Message:
+                        Body:
+                          Html:
+                            Charset: UTF-8
+                            Data.$: States.Format('{}<br><img src={}>', $.message, $.image.url)
+                        Subject:
+                          Charset: UTF-8
+                          Data: Doorbell
+                      Source: ${FromEmail}
+              - StartAt: Send debug message
+                States:
+                  Send debug message:
+                    Type: Task
+                    Resource: arn:aws:states:::lambda:invoke
+                    OutputPath: $.Payload
+                    Parameters:
+                      Payload.$: $
+                      FunctionName: ${DebugPublisher}
+                    Retry:
+                      - ErrorEquals:
+                          - Lambda.ServiceException
+                          - Lambda.AWSLambdaException
+                          - Lambda.SdkClientException
+                          - Lambda.TooManyRequestsException
+                        IntervalSeconds: 2
+                        MaxAttempts: 6
+                        BackoffRate: 2
+                    End: true
             End: true
-            Parameters:
-              Destination:
-                ToAddresses:
-                  - ${ToEmail}
-              Message:
-                Body:
-                  Html:
-                    Charset: UTF-8
-                    Data.$: States.Format('{}<br><img src={}>', $.message, $.image.url)
-                Subject:
-                  Charset: UTF-8
-                  Data: Doorbell
-              Source: ${FromEmail}
-      - StartAt: Synthesise speech and send to MQTT
+      - StartAt: Synthesise speech and send to MQTT topic
         States:
-          Synthesise speech and send to MQTT:
+          Synthesise speech and send to MQTT topic:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             OutputPath: $.Payload
             Parameters:
               Payload.$: $
-              FunctionName: ${SynthesizeSpeech}
+              FunctionName: arn:aws:lambda:eu-west-1:232740153640:function:doorbell-backend-SynthesizeSpeech-ttZf5KkKxupP
             Retry:
               - ErrorEquals:
                   - Lambda.ServiceException

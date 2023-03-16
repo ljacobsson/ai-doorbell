@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform:
-  - 'AWS::Serverless-2016-10-31'
+  - AWS::Serverless-2016-10-31
 Parameters:
   ToEmail:
     Type: String
@@ -15,13 +15,13 @@ Globals:
     Timeout: 10
 Resources:
   S3Bucket:
-    Type: 'AWS::S3::Bucket'
+    Type: AWS::S3::Bucket
     Properties:
       NotificationConfiguration:
         EventBridgeConfiguration:
           EventBridgeEnabled: true
   GetS3UploadURL:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: src/GetS3UploadURL.handler
       Environment:
@@ -41,7 +41,7 @@ Resources:
         - S3WritePolicy:
             BucketName: !Ref S3Bucket
   BatteryReport:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       Handler: src/BatteryReport.handler
       Environment:
@@ -64,11 +64,11 @@ Resources:
             - Sid: Statement1
               Effect: Allow
               Action:
-                - 'ses:SendEmail'
+                - ses:SendEmail
               Resource:
                 - '*'
   StateMachine:
-    Type: 'AWS::Serverless::StateMachine'
+    Type: AWS::Serverless::StateMachine
     Properties:
       Policies:
         - Version: 2012-10-17
@@ -76,8 +76,8 @@ Resources:
             - Sid: Statement1
               Effect: Allow
               Action:
-                - 'rekognition:DetectFaces'
-                - 'rekognition:DetectLabels'
+                - rekognition:DetectFaces
+                - rekognition:DetectLabels
               Resource:
                 - '*'
         - S3CrudPolicy:
@@ -91,7 +91,7 @@ Resources:
             - Sid: Statement1
               Effect: Allow
               Action:
-                - 'ses:SendEmail'
+                - ses:SendEmail
               Resource:
                 - '*'
         - Version: 2012-10-17
@@ -99,8 +99,8 @@ Resources:
             - Sid: Statement1
               Effect: Allow
               Action:
-                - 'polly:StartSpeechSynthesisTask'
-                - 'polly:synthesizeSpeech'
+                - polly:StartSpeechSynthesisTask
+                - polly:synthesizeSpeech
               Resource:
                 - '*'
         - LambdaInvokePolicy:
@@ -109,16 +109,20 @@ Resources:
             FunctionName: !Ref SynthesizeSpeech
         - LambdaInvokePolicy:
             FunctionName: !Ref SingleFaceDescription
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ChatGPTEnricher
+        - LambdaInvokePolicy:
+            FunctionName: !Ref DebugPublisher
       DefinitionUri: ./statemachine/statemachine.yaml
       DefinitionSubstitutions:
         S3Bucket: !Ref S3Bucket
         ToEmail: !Ref ToEmail
         FromEmail: !Ref FromEmail
-        SynthesizeSpeech: !GetAtt SynthesizeSpeech.Arn
         FaceDescription: !GetAtt FaceDescription.Arn
         SingleFaceDescription: !GetAtt SingleFaceDescription.Arn
         CombineDescriptions: !GetAtt CombineDescriptions.Arn
         GetSignedImageURL: !GetAtt GetSignedImageURL.Arn
+        DebugPublisher: !Ref DebugPublisher
       Events:
         S3Event:
           Type: EventBridgeRule
@@ -138,17 +142,17 @@ Resources:
                   key:
                     - prefix: image/
   FaceDescription:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/FaceDescription.handler
   SingleFaceDescription:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/SingleFaceDescription.handler
   CombineDescriptions:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/CombineDescriptions.handler
@@ -156,7 +160,7 @@ Resources:
         - S3ReadPolicy:
             BucketName: !Ref S3Bucket
   SynthesizeSpeech:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/SynthesizeSpeech.handler
@@ -171,7 +175,7 @@ Resources:
             - Sid: Statement1
               Effect: Allow
               Action:
-                - 'polly:SynthesizeSpeech'
+                - polly:SynthesizeSpeech
               Resource:
                 - '*'
         - Version: 2012-10-17
@@ -179,11 +183,11 @@ Resources:
             - Sid: Statement1
               Effect: Allow
               Action:
-                - 'iot:Publish'
+                - iot:Publish
               Resource:
                 - '*'
   GetSignedImageURL:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/GetSignedImageURL.handler
@@ -194,7 +198,7 @@ Resources:
         - S3ReadPolicy:
             BucketName: !Ref S3Bucket
   ChatGPTEnricher:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: src/ChatGPTEnricher.handler
@@ -204,6 +208,20 @@ Resources:
             - Sid: Statement1
               Effect: Allow
               Action:
-                - 'secretsmanager:GetSecretValue'
+                - secretsmanager:GetSecretValue
+              Resource:
+                - '*'
+  DebugPublisher:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/DebugPublisher.handler
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Sid: Statement1
+              Effect: Allow
+              Action:
+                - iot:Publish
               Resource:
                 - '*'
