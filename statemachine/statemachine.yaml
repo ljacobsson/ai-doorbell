@@ -140,7 +140,7 @@ States:
             Parameters:
               Destination:
                 ToAddresses:
-                  - ${ToAddress}
+                  - ${ToEmail}
               Message:
                 Body:
                   Html:
@@ -149,7 +149,7 @@ States:
                 Subject:
                   Charset: UTF-8
                   Data: Doorbell
-              Source: ${FromAddress}
+              Source: ${FromEmail}
       - StartAt: Synthesise speech and send to MQTT
         States:
           Synthesise speech and send to MQTT:
