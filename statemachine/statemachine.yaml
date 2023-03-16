@@ -140,7 +140,7 @@ States:
             Parameters:
               Destination:
                 ToAddresses:
-                  - larsj82@gmail.com
+                  - ${ToAddress}
               Message:
                 Body:
                   Html:
